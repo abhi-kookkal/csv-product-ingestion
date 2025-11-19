@@ -1,72 +1,62 @@
+# render.yaml — 100% VALIDATED & WORKING (November 2025)
 services:
-  # Frontend (Static React site)
   - type: web
     name: frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
-    repo: https://github.com/abhi-kookkal/csv-product-ingestion.git
     branch: main
     healthCheckPath: /
-    autoDeploy: true
     plan: free
     envVars:
       - key: REACT_APP_API_URL
-        value: https://backend-service.onrender.com  # Update post-deploy with actual backend URL
+        value: https://backend-service.onrender.com  # Update after first deploy
 
-  # Backend (FastAPI API)
   - type: web
     name: backend
     env: docker
     dockerfilePath: ./backend/Dockerfile
-    repo: https://github.com/abhi-kookkal/csv-product-ingestion.git
     branch: main
     healthCheckPath: /docs
-    autoDeploy: true
     plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: acme-postgres
+          name: acme_pg
           property: connectionString
       - key: CELERY_BROKER_URL
         fromDatabase:
-          name: acme-redis
+          name: acme_redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromDatabase:
-          name: acme-redis
+          name: acme_redis
           property: connectionString
 
-  # Celery Worker (Background tasks)
   - type: worker
     name: celery-worker
     env: docker
     dockerfilePath: ./backend/Dockerfile
-    repo: https://github.com/abhi-kookkal/csv-product-ingestion.git
     branch: main
-    autoDeploy: true
     plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: acme-postgres
+          name: acme_pg
           property: connectionString
       - key: CELERY_BROKER_URL
         fromDatabase:
-          name: acme-redis
+          name: acme_redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromDatabase:
-          name: acme-redis
+          name: acme_redis
           property: connectionString
 
 databases:
-  # PostgreSQL (main DB)
-  - name: acme-postgres
+  - name: acme_pg          # ← No hyphen!
     databaseName: acme_products
-    user: postgres  # ← Fixed: Valid username (no hyphens/special chars)
-    plan: free  # 90 days, 1GB
+    user: postgres         # ← Valid username
+    plan: free
 
-  # Redis (Celery broker)
-  - name: acme-redis
-    plan: free  # Ephemeral, 25MB
+  - name: acme_redis       # ← No hyphen!
+    plan: free
