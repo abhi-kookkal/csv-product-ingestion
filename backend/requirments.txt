@@ -8,3 +8,5 @@ celery[redis]==5.4.0
 redis==5.0.8
 alembic==1.13.3
 python-multipart==0.0.9
+pydantic-settings
+psycopg2
