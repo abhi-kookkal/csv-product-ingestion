@@ -9,7 +9,7 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
     sku = Column(CITEXT, unique=True, index=True)  # Case-insensitive unique SKU
     name = Column(String(256), nullable=False)
-    description = Text()
+    description = Column(Text, nullable=True, default="")
     is_active = Column(Boolean, default=True, server_default="true")
 
 class Webhook(Base):
