@@ -3,7 +3,7 @@ services:
     name: frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
-    repo: https://github.com/yourusername/your-repo.git  # Replace with your GitHub repo
+    repo: https://github.com/abhi-kookkal/csv-product-ingestion
     branch: main
     envVars:
       - key: REACT_APP_API_URL
@@ -13,7 +13,7 @@ services:
     name: backend
     env: docker
     dockerfilePath: ./backend/Dockerfile
-    repo: https://github.com/yourusername/your-repo.git
+    repo: https://github.com/abhi-kookkal/csv-product-ingestion
     branch: main
     envVars:
       - key: DATABASE_URL
@@ -30,7 +30,7 @@ services:
     name: celery-worker
     env: docker
     dockerfilePath: ./backend/Dockerfile
-    repo: https://github.com/yourusername/your-repo.git
+    repo: https://github.com/abhi-kookkal/csv-product-ingestion
     branch: main
     envVars:
       - key: DATABASE_URL
