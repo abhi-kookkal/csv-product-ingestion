@@ -7,6 +7,9 @@ from .database import get_db
 from .tasks import process_csv_import
 import uuid, tempfile, os
 import fastapi.middleware.cors
+from fastapi import BackgroundTasks
+from typing import List
+from .models import Product
 
 app = FastAPI(title="Acme Products Importer")
 
@@ -85,7 +88,70 @@ async def create_product(product: ProductCreate, db: AsyncSession = Depends(get_
             raise HTTPException(status_code=400, detail=f"SKU '{product.sku}' already exists.")
         raise HTTPException(status_code=400, detail="Database integrity error.")
 
-@app.get("/products/")
+# ──────────────────────────────
+# UPDATE PRODUCT BY ID
+# ──────────────────────────────
+@app.put("/products/{product_id}", response_model=ProductInDB)
+async def update_product(
+    product_id: int,
+    product_in: ProductCreate,
+    db: AsyncSession = Depends(get_db),
+    background_tasks: BackgroundTasks = None
+):
+    """
+    Update an existing product by ID.
+    Used by inline editing and modal form.
+    """
+    # Get existing product
+    existing_product = await db.get(Product, product_id)
+    if not existing_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Check if SKU is being changed and conflicts with another product
+    if product_in.sku.lower() != existing_product.sku.lower():
+        conflict = await db.execute(
+            select(Product).where(Product.sku.ilike(product_in.sku))
+        )
+        if conflict.scalar_one_or_none():
+            raise HTTPException(
+                status_code=400,
+                detail=f"SKU '{product_in.sku}' is already taken by another product"
+            )
+
+    # Update fields
+    update_data = product_in.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(existing_product, field, value)
+
+    await db.commit()
+    await db.refresh(existing_product)
+
+    # Fire webhook
+    background_tasks.add_task(
+        trigger_webhooks,
+        event="product.updated",
+        data={
+            "id": existing_product.id,
+            "sku": existing_product.sku,
+            "old_sku": existing_product.sku if product_in.sku.lower() == existing_product.sku.lower() else "changed",
+            "name": existing_product.name
+        },
+        db=db
+    )
+
+    return existing_product
+
+@app.delete("/products/{product_id}", status_code=204)
+async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    await db.delete(product)
+    await db.commit()
+    return Response(status_code=204)
+
+@app.get("/products/", response_model=List[ProductInDB])
 async def read_products(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,

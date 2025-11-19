@@ -28,6 +28,16 @@ export const getProducts = ({ skip = 0, limit = 20, sku, active }: { skip?: numb
   return api.get('/products/', { params });
 }
 
+export const createProduct = (data: { sku: string; name: string; description?: string; is_active?: boolean }) =>
+  api.post('/products/', data)
+
+export const updateProduct = (id: number, data: { sku: string; name: string; description?: string; is_active?: boolean }) =>
+  api.put(`/products/${id}`, data)
+
+export const deleteProduct = (id: number) =>
+  api.delete(`/products/${id}`)
+
+
 export const deleteAllProducts = () =>
   api.delete('/products/all')
 
