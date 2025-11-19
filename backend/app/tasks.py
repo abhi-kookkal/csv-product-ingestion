@@ -20,8 +20,8 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine)
 
 celery_app = Celery("importer")
-celery_app.conf.broker_url = "redis://localhost:6379/0"
-celery_app.conf.result_backend = "redis://localhost:6379/1"
+celery_app.conf.broker_url = "redis://localhost:6380/0"
+celery_app.conf.result_backend = "redis://localhost:6380/1"
 celery_app.conf.task_acks_late = True
 celery_app.conf.worker_prefetch_multiplier = 1
 celery_app.conf.broker_connection_retry_on_startup = True  # removes warning
