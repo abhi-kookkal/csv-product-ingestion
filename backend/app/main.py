@@ -35,21 +35,43 @@ async def upload_csv(file: UploadFile = File(...)):
 
     return {"task_id": result.id, "status": "File uploaded – processing started"}
 
+# In main.py — REPLACE your current get_task_status with this
 @app.get("/tasks/{task_id}/status")
 def get_task_status(task_id: str):
-    task = process_csv_import.AsyncResult(task_id = task_id)
+    task = process_csv_import.AsyncResult(task_id)
+    
     if task.state == 'PENDING':
-        response = {"state": task.state, "progress": 0}
-    elif task.state != 'FAILURE':
-        response = {
-            "state": task.state,
-            "progress": task.info.get('progress', 0),
-            "current": task.info.get('current', 0),
-            "total": task.info.get('total', None)}
+        return {"state": "PENDING", "progress": 0, "status": "Waiting to start..."}
+    
+    elif task.state == 'PROGRESS':
+        info = task.info or {}
+        return {
+            "state": "PROGRESS",
+            "progress": info.get('progress', 0),
+            "current": info.get('current', 0),
+            "total": info.get('total', 0),
+            "status": f"Processing {info.get('current', 0)} / {info.get('total', 0)} rows..."
+        }
+    
+    elif task.state == 'SUCCESS':
+        return {
+            "state": "SUCCESS",
+            "progress": 100,
+            "status": "Import completed successfully!",
+            "result": task.result
+        }
+    
+    elif task.state == 'FAILURE':
+        error = str(task.info) if task.info else "Unknown error"
+        return {
+            "state": "FAILURE",
+            "progress": 0,
+            "status": "Import failed",
+            "error": error
+        }
+    
     else:
-        response = {"state": task.state, "error": str(task.info.get('exc_info'))}
-
-    return response
+        return {"state": task.state, "progress": 0, "status": "Unknown state"}
 
 from sqlalchemy.exc import IntegrityError
 

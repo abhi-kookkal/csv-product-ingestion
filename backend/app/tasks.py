@@ -27,69 +27,57 @@ celery_app.conf.worker_prefetch_multiplier = 1
 celery_app.conf.broker_connection_retry_on_startup = True  # removes warning
 
 import asyncio
-
-@celery_app.task(bind=True, name="process_csv_import")
+# app/tasks.py — FINAL VERSION (copy-paste)
+@celery_app.task(bind=True)
 def process_csv_import(self, file_path: str):
-    return asyncio.run(_process_csv_import(self, file_path))
-
-async def _process_csv_import(self, file_path: str):
     # Count total rows
-    with open(file_path, encoding="utf-8") as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         total = sum(1 for _ in csv.DictReader(f))
-    print(total)
-    self.update_state(state="PROGRESS", meta={"progress": 0, "current": 0, "total": total})
-    print("Progress updated")
-    imported = 0
+    
+    self.update_state(state='PROGRESS', meta={'progress': 0, 'current': 0, 'total': total, 'status': 'Starting...'})
+
     session = SessionLocal()
+    imported = 0
 
     try:
-        with open(file_path, newline="", encoding="utf-8") as f:
-            print("File opened")
+        with open(file_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                print("Row read")
-                sku = (row.get("SKU") or row.get("sku") or row.get("Sku") or "").strip()
+                sku = (row.get('SKU') or row.get('sku') or '').strip()
                 if not sku:
                     continue
-                print("SKU found")
-                name = (row.get("Name") or row.get("name") or "").strip()
-                desc = row.get("Description") or row.get("description") or ""
-                print("Name and description found")
 
-                session.execute(
-                    text("""
-                        INSERT INTO products (sku, name, description, is_active)
-                        VALUES (:sku, :name, :desc, true)
-                        ON CONFLICT (sku) DO UPDATE
-                        SET name = EXCLUDED.name,
-                            description = EXCLUDED.description,
-                            is_active = true
-                    """),
-                    {"sku": sku, "name": name, "desc": desc}
-                )
-                print("Product inserted")
+                name = (row.get('Name') or row.get('name') or '').strip()
+                desc = row.get('Description') or row.get('description') or ''
+
+                session.execute(text("""
+                    INSERT INTO products (sku, name, description, is_active)
+                    VALUES (:sku, :name, :desc, true)
+                    ON CONFLICT (sku) DO UPDATE 
+                    SET name = EXCLUDED.name,
+                        description = EXCLUDED.description,
+                        is_active = true
+                """), {"sku": sku, "name": name, "desc": desc})
+
                 imported += 1
-                print("Imported count updated")
 
                 # Update progress every 5,000 rows
-                if imported % 5000 == 0:
-                    session.commit()
+                if imported % 5000 == 0 or imported == total:
                     progress = round((imported / total) * 100, 1)
-                    self.update_state(
-                        state="PROGRESS",
-                        meta={"progress": progress, "current": imported, "total": total}
-                    )
-                    print("Progress updated")
-            session.commit()
-            print("Session committed")
+                    session.commit()
+                    self.update_state(state='PROGRESS', meta={
+                        'progress': progress,
+                        'current': imported,
+                        'total': total,
+                        'status': f'Imported {imported}/{total} products...'
+                    })
+
+        session.commit()
     except Exception as e:
         session.rollback()
         raise e
     finally:
         session.close()
-        try:
-            os.remove(file_path)
-        except:
-            pass
+        os.remove(file_path)
 
-    return {"status": "completed", "imported_rows": imported}
+    return {"imported": imported, "status": "success"}
