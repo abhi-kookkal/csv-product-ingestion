@@ -236,25 +236,27 @@ export default function Webhooks() {
                   />
                 </td>
                 <td style={{ padding: '14px 12px' }}>
-                  <button
-                    onClick={() => handleTest(webhook.id)}
-                    style={{ marginRight: 8, background: '#2980b9', color: 'white', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => (e.currentTarget.style.background = '#1565c0')}
-                    onMouseOut={e => (e.currentTarget.style.background = '#2980b9')}
-                  >Test</button>
-                  <button
-                    onClick={() => handleEdit(webhook)}
-                    style={{ marginRight: 8, background: '#f1c40f', color: '#2c3e50', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => (e.currentTarget.style.background = '#f39c12')}
-                    onMouseOut={e => (e.currentTarget.style.background = '#f1c40f')}
-                  >Edit</button>
-                  <button
-                    className="danger"
-                    onClick={() => handleDelete(webhook.id)}
-                    style={{ background: '#e74c3c', color: 'white', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => (e.currentTarget.style.background = '#c0392b')}
-                    onMouseOut={e => (e.currentTarget.style.background = '#e74c3c')}
-                  >Delete</button>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button
+                      onClick={() => handleTest(webhook.id)}
+                      style={{ background: '#2980b9', color: 'white', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                      onMouseOver={e => (e.currentTarget.style.background = '#1565c0')}
+                      onMouseOut={e => (e.currentTarget.style.background = '#2980b9')}
+                    >Test</button>
+                    <button
+                      onClick={() => handleEdit(webhook)}
+                      style={{ background: '#f1c40f', color: '#2c3e50', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                      onMouseOver={e => (e.currentTarget.style.background = '#f39c12')}
+                      onMouseOut={e => (e.currentTarget.style.background = '#f1c40f')}
+                    >Edit</button>
+                    <button
+                      className="danger"
+                      onClick={() => handleDelete(webhook.id)}
+                      style={{ background: '#e74c3c', color: 'white', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                      onMouseOver={e => (e.currentTarget.style.background = '#c0392b')}
+                      onMouseOut={e => (e.currentTarget.style.background = '#e74c3c')}
+                    >Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}

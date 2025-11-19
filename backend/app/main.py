@@ -141,6 +141,11 @@ async def update_product(
 
     return existing_product
 
+@app.delete("/products/all", status_code=204)
+async def delete_all_products(db: AsyncSession = Depends(get_db)):
+    await crud.remove_all_products(db=db)
+    return Response(status_code=204)
+
 @app.delete("/products/{product_id}", status_code=204)
 async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
     product = await db.get(Product, product_id)
@@ -162,7 +167,6 @@ async def read_products(
     products = await crud.get_products(db, skip=skip, limit=limit, sku=sku, active=active)
     return products
 
-@app.delete("/products/all", status_code=204)
 async def delete_all_products(db: AsyncSession = Depends(get_db)):
     await crud.remove_all_products(db=db)
     return Response(status_code=204)
