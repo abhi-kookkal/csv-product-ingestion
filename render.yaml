@@ -1,6 +1,5 @@
-# render.yaml — WORKING VERSION (November 2025)
 services:
-  # ==================== FRONTEND ====================
+  # Frontend (Static React site)
   - type: web
     name: frontend
     env: docker
@@ -12,9 +11,9 @@ services:
     plan: free
     envVars:
       - key: REACT_APP_API_URL
-        value: https://backend-service.onrender.com  # ← Update after deploy
+        value: https://backend-service.onrender.com  # Update post-deploy with actual backend URL
 
-  # ==================== BACKEND API ====================
+  # Backend (FastAPI API)
   - type: web
     name: backend
     env: docker
@@ -38,8 +37,8 @@ services:
           name: acme-redis
           property: connectionString
 
-  # ==================== CELERY WORKER ====================
-  - type: worker          # ← This is the only place runCommand is allowed!
+  # Celery Worker (Background tasks)
+  - type: worker
     name: celery-worker
     env: docker
     dockerfilePath: ./backend/Dockerfile
@@ -47,8 +46,6 @@ services:
     branch: main
     autoDeploy: true
     plan: free
-    # ← Correct field name for workers
-    startCommand: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=4
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -63,12 +60,13 @@ services:
           name: acme-redis
           property: connectionString
 
-# ==================== DATABASES ====================
 databases:
+  # PostgreSQL (main DB)
   - name: acme-postgres
     databaseName: acme_products
-    user: postgres
-    plan: free    # 90 days, 1GB
+    user: postgres  # ← Fixed: Valid username (no hyphens/special chars)
+    plan: free  # 90 days, 1GB
 
+  # Redis (Celery broker)
   - name: acme-redis
-    plan: free    # Ephemeral, 25MB
+    plan: free  # Ephemeral, 25MB
