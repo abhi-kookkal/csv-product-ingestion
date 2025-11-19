@@ -51,18 +51,6 @@ export default function Webhooks() {
     setShowForm(true)
   }
 
-  const handleUpdate = async (id: number) => {
-    setLoading(true)
-    try {
-      const res = await updateWebhook(id, form)
-      setWebhooks(webhooks.map(w => w.id === id ? res.data : w))
-      setShowForm(false)
-    } catch (err) {
-      console.error('Failed to update webhook')
-    }
-    setLoading(false)
-  }
-
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this webhook?')) return
     try {
