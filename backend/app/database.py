@@ -4,18 +4,25 @@ from pydantic_settings import BaseSettings
 from typing import AsyncGenerator
 
 class Settings(BaseSettings):
-    # Required env variables (no default → must come from .env or real env)
-    DATABASE_URL: str
-    REDIS_URL: str
-    REDIS_RESULT_BACKEND: str
+    # Database
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:1234@localhost:5432/csv_product"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # Celery / Redis
+    CELERY_BROKER_URL: str = "redis://redis:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://redis:6379/0"
 
-# Load all settings
+    # Optional additional settings
+    REDIS_URL: str | None = None
+
+    # pydantic v2 settings: read .env automatically
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": False,
+        "extra": "allow"
+    }
+
+# instantiate once and reuse
 settings = Settings()
-
 # --- Database setup ---
 engine = create_async_engine(
     settings.DATABASE_URL,
