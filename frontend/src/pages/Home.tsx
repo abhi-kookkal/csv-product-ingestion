@@ -68,11 +68,6 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [taskId, phase])
 
-  // Determine current progress (0–100 for current phase)
-  const currentProgress = phase === 'uploading' ? uploadProgress :
-    phase === 'importing' ? importProgress :
-      phase === 'complete' ? 100 : 0
-
   return (
     <div style={{ maxWidth: 700, margin: '40px auto', padding: '20px', fontFamily: 'system-ui, sans-serif' }}>
       <h1>Upload Product CSV</h1>

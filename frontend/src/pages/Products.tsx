@@ -75,8 +75,7 @@ export default function Products() {
   }, [page, pageSize, skuFilter, nameFilter, descFilter, activeFilter])
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-  const from = (page - 1) * pageSize + 1
-  const to = Math.min(page * pageSize, totalCount)
+
   // Only enable Next if we have a full page of products
   const canGoNext = products.length === pageSize && page < totalPages
 

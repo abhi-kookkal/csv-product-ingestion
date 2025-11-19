@@ -1,17 +1,33 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from pydantic_settings import BaseSettings
-
 from typing import AsyncGenerator
+
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:1234@localhost:5432/csv_product"
-    REDIS_URL: str = "redis://localhost:6379/0"
-    REDIS_RESULT_BACKEND: str = "redis://localhost:6379/1"
+    # Required env variables (no default → must come from .env or real env)
+    DATABASE_URL: str
+    REDIS_URL: str
+    REDIS_RESULT_BACKEND: str
 
-settings = Settings(_env_file=".env")
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
-engine = create_async_engine(settings.DATABASE_URL, echo=False, future=True)
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+# Load all settings
+settings = Settings()
+
+# --- Database setup ---
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=False,
+    future=True,
+)
+
+AsyncSessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 Base = declarative_base()
 
