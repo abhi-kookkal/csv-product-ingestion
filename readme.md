@@ -85,3 +85,45 @@ docker-compose up --build
 - All operations are async and scalable.
 
 ---
+
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td><img src="backend/assets/1.png" width="100%" /></td>
+    <td><img src="backend/assets/2.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/3.png" width="100%" /></td>
+    <td><img src="backend/assets/4.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/5.png" width="100%" /></td>
+    <td><img src="backend/assets/6.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/7.png" width="100%" /></td>
+    <td><img src="backend/assets/8.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/9.png" width="100%" /></td>
+    <td><img src="backend/assets/10.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/11.png" width="100%" /></td>
+    <td><img src="backend/assets/12.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/13.png" width="100%" /></td>
+    <td><img src="backend/assets/14.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/15.png" width="100%" /></td>
+    <td><img src="backend/assets/16.png" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="backend/assets/17.png" width="100%" /></td>
+    <td></td>
+  </tr>
+</table>
