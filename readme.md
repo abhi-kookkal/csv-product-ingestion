@@ -47,7 +47,7 @@ A production-ready, full-stack CSV Product Importer designed to efficiently hand
 ## 🚦 Quick Start (Docker)
 
 ```bash
-git clone https://github.com/yourusername/csv-product-ingestion.git
+git clone https://github.com/abhi-kookkal/csv-product-ingestion.git
 cd csv-product-ingestion
 docker-compose up --build
 ```
@@ -60,13 +60,15 @@ docker-compose up --build
 
 1. **Backend**
     ```bash
+    docker compose up postgres redis
     cd backend
     python -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
-    cp .env.example .env  # Edit DB/Redis URLs as needed
+    create .env file
     alembic upgrade head
     uvicorn app.main:app --reload
+    celery -A app.tasks.celery_app worker --loglevel=info --pool=solo
     ```
 2. **Frontend**
     ```bash
